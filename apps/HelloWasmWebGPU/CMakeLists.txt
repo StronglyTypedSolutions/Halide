@@ -13,6 +13,8 @@ set(halide_includes "$<TARGET_PROPERTY:Halide::Runtime,INTERFACE_INCLUDE_DIRECTO
 find_program(EMCC emcc REQUIRED HINTS "$ENV{EMSDK}/upstream/emscripten")
 
 configure_file(index.html index.html COPYONLY)
+configure_file(sw.js sw.js COPYONLY)
+configure_file(main.js main.js COPYONLY)
 
 set(EMCC_FLAGS -s WASM=1 -s USE_SDL=2 -s TOTAL_MEMORY=512MB -O3 -s USE_WEBGPU=1 -s ASYNCIFY)
 set(EMCC_FLAGS_threads -pthread -matomics)
@@ -56,7 +58,7 @@ foreach(simd IN ITEMS "" "_simd")
             DEPENDS ${config}_init ${config}_update ${config}_render
             COMMAND_EXPAND_LISTS)
 
-        add_custom_target(${config} ALL DEPENDS ${js_file})
+        add_custom_target(${config} ALL DEPENDS ${js_file} )
     endforeach()
 endforeach()
 
@@ -66,9 +68,9 @@ foreach(gen IN ITEMS init update render)
         PARAMS threads=true)
 endforeach()
 
-add_executable(run ${init_cpp} ${update_cpp} ${render_cpp})
-target_link_libraries(run PRIVATE Halide::RunGenMain reaction_diffusion_init reaction_diffusion_update reaction_diffusion_render)
+# add_executable(run ${init_cpp} ${update_cpp} ${render_cpp})
+# target_link_libraries(run PRIVATE Halide::RunGenMain reaction_diffusion_init reaction_diffusion_update reaction_diffusion_render)
 
-add_test(NAME init_bench COMMAND run --benchmarks=all --benchmark_min_time=1 --name=reaction_diffusion_init --output_extents=[1024,1024] --parsable_output)
-add_test(NAME update_bench COMMAND run --benchmarks=all --benchmark_min_time=1 --name=reaction_diffusion_update --output_extents=[1024,1024] frame=0 mouse_x=0 mouse_y=0 state=random:0:[1024,1024,3] --parsable_output)
-add_test(NAME render_bench COMMAND run --benchmarks=all --benchmark_min_time=1 --name=reaction_diffusion_render --output_extents=[1024,1024] state=random:0:[1024,1024,3] --parsable_output)
+# add_test(NAME init_bench COMMAND run --benchmarks=all --benchmark_min_time=1 --name=reaction_diffusion_init --output_extents=[1024,1024] --parsable_output)
+# add_test(NAME update_bench COMMAND run --benchmarks=all --benchmark_min_time=1 --name=reaction_diffusion_update --output_extents=[1024,1024] frame=0 mouse_x=0 mouse_y=0 state=random:0:[1024,1024,3] --parsable_output)
+# add_test(NAME render_bench COMMAND run --benchmarks=all --benchmark_min_time=1 --name=reaction_diffusion_render --output_extents=[1024,1024] state=random:0:[1024,1024,3] --parsable_output)
